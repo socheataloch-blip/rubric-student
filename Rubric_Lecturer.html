@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rubric</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f4f8;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 60%, #1a8cff 100%);
+    color: white;
+    padding: 36px 40px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 80px; bottom: -80px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .header-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #AED6F1;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .header-sub {
+    font-size: 14px;
+    color: #BDD7EE;
+    margin-bottom: 20px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+  /* ─── STUDENT INFO ─── */
+  .student-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .field-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #2E75B6;
+    margin-bottom: 6px;
+  }
+  .field-group input, .field-group select {
+    width: 100%;
+    border: 1.5px solid #D6E4F0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: #f8fbfe;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field-group input:focus, .field-group select:focus {
+    border-color: #2E75B6;
+    background: white;
+  }
+
+  /* ─── SECTION TABS ─── */
+  .section-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 10px 22px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn.slide  { background: #D6E4F0; color: #1F4E79; }
+  .tab-btn.report { background: #E8F5E9; color: #1E5631; }
+  .tab-btn.oral   { background: #FFF3E0; color: #8B4000; }
+  .tab-btn.all    { background: #F3E5F5; color: #4A0072; }
+  .tab-btn.active { transform: scale(1.04); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+  .tab-btn.slide.active  { background: #1F4E79; color: white; }
+  .tab-btn.report.active { background: #1E5631; color: white; }
+  .tab-btn.oral.active   { background: #8B4000; color: white; }
+  .tab-btn.all.active    { background: #4A0072; color: white; }
+
+  /* ─── RUBRIC SECTION ─── */
+  .rubric-section {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+    margin-bottom: 24px;
+    overflow: hidden;
+    display: none;
+  }
+  .rubric-section.visible { display: block; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 2px solid #f0f4f8;
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .slide-color  { background: #D6E4F0; }
+  .report-color { background: #E8F5E9; }
+  .oral-color   { background: #FFF3E0; }
+
+  .section-name { font-size: 18px; font-weight: 800; }
+  .section-pct  { font-size: 13px; color: #666; margin-top: 2px; }
+  .slide-text   { color: #1F4E79; }
+  .report-text  { color: #1E5631; }
+  .oral-text    { color: #8B4000; }
+
+  .section-score-display {
+    text-align: right;
+  }
+  .score-number {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .score-denom  { font-size: 16px; font-weight: 600; color: #999; }
+  .score-label  { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  /* ─── CRITERIA ROWS ─── */
+  .criteria-table { width: 100%; border-collapse: collapse; }
+  
+  .criteria-header {
+    display: grid;
+    grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 90px;
+    gap: 0;
+    padding: 10px 28px;
+    background: #f8fbfe;
+    border-bottom: 1px solid #e8f0f8;
+  }
+  .criteria-header span {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #666;
+    padding: 0 8px;
+  }
+  .criteria-header span:first-child { padding-left: 0; }
+
+  .criteria-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 90px;
+    border-bottom: 1px solid #f0f4f8;
+    align-items: stretch;
+    min-height: 80px;
+  }
+  .criteria-row:last-child { border-bottom: none; }
+
+  .criteria-name {
+    padding: 16px 28px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 2px solid #f0f4f8;
+  }
+  .criteria-weight {
+    font-size: 11px;
+    font-weight: 500;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .level-cell {
+    padding: 14px 16px;
+    font-size: 12px;
+    color: #444;
+    line-height: 1.5;
+    cursor: pointer;
+    border-right: 1px solid #f0f4f8;
+    transition: background 0.15s;
+    position: relative;
+    user-select: none;
+  }
+  .level-cell:last-of-type { border-right: none; }
+  .level-cell:hover { opacity: 0.85; }
+  .level-cell.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px; right: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    color: white;
+    background: rgba(0,0,0,0.25);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 22px;
+    text-align: center;
+  }
+
+  /* Level colors */
+  .level-5 { background: #EDE7F6; }
+  .level-4 { background: #E8F5E9; }
+  .level-3 { background: #E3F2FD; }
+  .level-2 { background: #FFF8E1; }
+  .level-1 { background: #FFEBEE; }
+  .level-5.selected { background: #4A0072; color: white; }
+  .level-4.selected { background: #2E7D32; color: white; }
+  .level-3.selected { background: #1565C0; color: white; }
+  .level-2.selected { background: #E65100; color: white; }
+  .level-1.selected { background: #C62828; color: white; }
+
+  .level-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .badge-5 { background: rgba(74,0,114,0.15); color: #4A0072; }
+  .badge-4 { background: rgba(46,125,50,0.15); color: #2E7D32; }
+  .badge-3 { background: rgba(21,101,192,0.15); color: #1565C0; }
+  .badge-2 { background: rgba(230,81,0,0.15); color: #E65100; }
+  .badge-1 { background: rgba(198,40,40,0.15); color: #C62828; }
+  .level-5.selected .badge-5 { background: rgba(255,255,255,0.25); color: white; }
+  .level-4.selected .badge-4 { background: rgba(255,255,255,0.25); color: white; }
+  .level-3.selected .badge-3 { background: rgba(255,255,255,0.25); color: white; }
+  .level-2.selected .badge-2 { background: rgba(255,255,255,0.25); color: white; }
+  .level-1.selected .badge-1 { background: rgba(255,255,255,0.25); color: white; }
+
+  .points-cell {
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8fbfe;
+  }
+  .points-val {
+    font-size: 22px;
+    font-weight: 900;
+    color: #2E75B6;
+  }
+  .points-label { font-size: 10px; color: #aaa; }
+
+  /* ─── COMMENTS ─── */
+  .comments-row {
+    padding: 16px 28px;
+    background: #f8fbfe;
+    border-top: 2px solid #f0f4f8;
+  }
+  .comments-row label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #666;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .comments-row textarea {
+    width: 100%;
+    border: 1.5px solid #D6E4F0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: white;
+    resize: vertical;
+    min-height: 70px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .comments-row textarea:focus { border-color: #2E75B6; }
+
+  /* ─── TOTAL SCORE CARD ─── */
+  .total-card {
+    background: linear-gradient(135deg, #1F4E79, #2E75B6);
+    border-radius: 14px;
+    padding: 28px 32px;
+    color: white;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(31,78,121,0.3);
+  }
+  .total-left h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .total-left p  { font-size: 13px; color: #AED6F1; }
+  .total-bars { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .bar-item { flex: 1; min-width: 120px; }
+  .bar-label { font-size: 11px; color: #BDD7EE; margin-bottom: 4px; font-weight: 600; }
+  .bar-track {
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .bar-slide  .bar-fill { background: #AED6F1; }
+  .bar-report .bar-fill { background: #A5D6A7; }
+  .bar-oral   .bar-fill { background: #FFCC80; }
+  .bar-val { font-size: 12px; color: white; margin-top: 3px; font-weight: 700; }
+
+  .total-right { text-align: center; }
+  .total-score-big {
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .total-denom { font-size: 20px; font-weight: 600; color: #BDD7EE; }
+  .total-grade {
+    font-size: 13px;
+    font-weight: 700;
+    color: #AED6F1;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── PRINT BUTTON ─── */
+  .action-bar {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 11px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-primary   { background: #1F4E79; color: white; }
+  .btn-secondary { background: white; color: #1F4E79; border: 2px solid #1F4E79; }
+  .btn-danger    { background: #C00000; color: white; }
+  .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  /* ─── LEGEND ─── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 16px 28px;
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    align-items: center;
+  }
+  .legend-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #888; flex-shrink: 0; }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600;
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  @media print {
+    body { background: white; }
+    .action-bar, .section-tabs, .legend { display: none !important; }
+    .rubric-section { display: block !important; box-shadow: none; }
+    .container { padding: 8px; max-width: 100%; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 20px 24px; }
+    .total-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .level-cell, .criteria-name, .section-icon, .section-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .student-card { box-shadow: none; border: 1px solid #ddd; }
+    .field-group input, .field-group select { border: 1px solid #ccc; background: white; }
+    @page { margin: 1cm; size: A4 landscape; }
+  }
+
+  @media (max-width: 768px) {
+    .criteria-row, .criteria-header {
+      grid-template-columns: 1fr;
+    }
+    .criteria-name { border-right: none; border-bottom: 2px solid #f0f4f8; }
+    .level-cell { border-right: none; border-bottom: 1px solid #f0f4f8; }
+    .total-card { grid-template-columns: 1fr; }
+    .total-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Presentation Assessment</div>
+  <h1>Rubric</h1>
+  <div class="header-sub">Royal University of Phnom Penh &nbsp;·&nbsp; Faculty of Science &nbsp;·&nbsp; Department of Physics</div>
+  <div class="header-meta">
+    <span class="meta-chip">📊 Total: 150 Points (15%)</span>
+    <span class="meta-chip">🖥️ Slide: 50 pts</span>
+    <span class="meta-chip">📝 Report: 50 pts</span>
+    <span class="meta-chip">🎤 Oral: 50 pts</span>
+    <span class="meta-chip">👩‍🏫 Ms. Loch Socheata</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- STUDENT INFO -->
+  <div class="student-card">
+    <div class="field-group">
+      <label>Subject</label>
+      <input type="text" id="subjectField" placeholder="e.g. Modern Physics, Calculus">
+    </div>
+    <div class="field-group">
+      <label>Class</label>
+      <input type="text" id="classSel" placeholder="e.g. Class A, Year 2">
+    </div>
+    <div class="field-group">
+      <label>Group Number</label>
+      <input type="text" id="groupNum" placeholder="e.g. Group 3">
+    </div>
+    <div class="field-group">
+      <label>Topic / Assignment</label>
+      <input type="text" id="topicSel" placeholder="e.g. Group Presentation, Lab Report">
+    </div>
+    <div class="field-group">
+      <label>Student Name(s)</label>
+      <input type="text" id="studentNames" placeholder="e.g. Sophea, Dara, Mony">
+    </div>
+    <div class="field-group">
+      <label>Date of Presentation</label>
+      <input type="date" id="presDate">
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="legend-title">Score Levels</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#4A0072"></div>Outstanding (5)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2E7D32"></div>Excellent (4)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1565C0"></div>Good (3)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E65100"></div>Fair (2)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#C62828"></div>Poor (1)</div>
+    <span style="font-size:12px;color:#888;margin-left:auto">👆 Click a cell to select score</span>
+  </div>
+
+  <!-- TABS -->
+  <div class="section-tabs">
+    <button class="tab-btn slide active"  onclick="showSection('all')">📋 Show All</button>
+    <button class="tab-btn slide"  onclick="showSection('slide')">🖥️ Slide Presentation</button>
+    <button class="tab-btn report" onclick="showSection('report')">📝 Written Report</button>
+    <button class="tab-btn oral"   onclick="showSection('oral')">🎤 Oral Presentation</button>
+  </div>
+
+  <!-- TOTAL SCORE CARD -->
+  <div class="total-card">
+    <div class="total-left">
+      <h2>Overall Score</h2>
+      <p>Select a level in each row to calculate the score automatically</p>
+      <div class="total-bars">
+        <div class="bar-item bar-slide">
+          <div class="bar-label">🖥️ Slide &nbsp;<span id="slideScoreBar">0</span>/50</div>
+          <div class="bar-track"><div class="bar-fill" id="slideBar" style="width:0%"></div></div>
+        </div>
+        <div class="bar-item bar-report">
+          <div class="bar-label">📝 Report &nbsp;<span id="reportScoreBar">0</span>/50</div>
+          <div class="bar-track"><div class="bar-fill" id="reportBar" style="width:0%"></div></div>
+        </div>
+        <div class="bar-item bar-oral">
+          <div class="bar-label">🎤 Oral &nbsp;<span id="oralScoreBar">0</span>/50</div>
+          <div class="bar-track"><div class="bar-fill" id="oralBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="total-right">
+      <div class="total-score-big" id="totalScore">0</div>
+      <div class="total-denom">/ 150</div>
+      <div class="total-grade" id="gradeLabel">—</div>
+    </div>
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="action-bar">
+    <div id="resetNormal">
+      <button class="btn btn-secondary" onclick="showResetConfirm()">🔄 Reset All</button>
+    </div>
+    <div id="resetConfirm" style="display:none; display:none; align-items:center; gap:10px;">
+      <span style="font-size:13px; font-weight:600; color:#C00000;">Are you sure?</span>
+      <button class="btn btn-danger" onclick="resetAll()">Yes, Reset</button>
+      <button class="btn btn-secondary" onclick="cancelReset()">Cancel</button>
+    </div>
+    <button class="btn btn-primary" onclick="downloadPDF()">⬇️ Download as PDF</button>
+    <button class="btn btn-secondary" onclick="openInBrowser()" title="Open in browser for full print support" style="background:#4A0072;color:white;border:none;">🌐 Open in Browser</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SLIDE SECTION -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="rubric-section visible" id="sec-slide">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon slide-color">🖥️</div>
+        <div>
+          <div class="section-name slide-text">Slide Presentation</div>
+          <div class="section-pct">5% of final grade &nbsp;·&nbsp; 50 points</div>
+        </div>
+      </div>
+      <div class="section-score-display">
+        <div class="score-number slide-text" id="slideScore">0</div>
+        <div class="score-denom">/ 50</div>
+        <div class="score-label">Points</div>
+      </div>
+    </div>
+
+    <div class="criteria-header">
+      <span>Criteria</span>
+      <span>⭐ Outstanding (5)</span>
+      <span>🟢 Excellent (4)</span>
+      <span>🔵 Good (3)</span>
+      <span>🟡 Fair (2)</span>
+      <span>🔴 Poor (1)</span>
+      <span>Score</span>
+    </div>
+
+    <!-- SLIDE CRITERIA -->
+    <div id="slide-rows"></div>
+
+    <div class="comments-row">
+      <label>💬 Lecturer Comments – Slide Presentation</label>
+      <textarea id="slideComment" placeholder="Enter specific feedback on the slide presentation here..."></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- REPORT SECTION -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="rubric-section visible" id="sec-report">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon report-color">📝</div>
+        <div>
+          <div class="section-name report-text">Written Report</div>
+          <div class="section-pct">5% of final grade &nbsp;·&nbsp; 50 points</div>
+        </div>
+      </div>
+      <div class="section-score-display">
+        <div class="score-number report-text" id="reportScore">0</div>
+        <div class="score-denom">/ 50</div>
+        <div class="score-label">Points</div>
+      </div>
+    </div>
+
+    <div class="criteria-header">
+      <span>Criteria</span>
+      <span>⭐ Outstanding (5)</span>
+      <span>🟢 Excellent (4)</span>
+      <span>🔵 Good (3)</span>
+      <span>🟡 Fair (2)</span>
+      <span>🔴 Poor (1)</span>
+      <span>Score</span>
+    </div>
+
+    <div id="report-rows"></div>
+
+    <div class="comments-row">
+      <label>💬 Lecturer Comments – Written Report</label>
+      <textarea id="reportComment" placeholder="Enter specific feedback on the written report here..."></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- ORAL SECTION -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="rubric-section visible" id="sec-oral">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon oral-color">🎤</div>
+        <div>
+          <div class="section-name oral-text">Oral Presentation</div>
+          <div class="section-pct">5% of final grade &nbsp;·&nbsp; 50 points</div>
+        </div>
+      </div>
+      <div class="section-score-display">
+        <div class="score-number oral-text" id="oralScore">0</div>
+        <div class="score-denom">/ 50</div>
+        <div class="score-label">Points</div>
+      </div>
+    </div>
+
+    <div class="criteria-header">
+      <span>Criteria</span>
+      <span>⭐ Outstanding (5)</span>
+      <span>🟢 Excellent (4)</span>
+      <span>🔵 Good (3)</span>
+      <span>🟡 Fair (2)</span>
+      <span>🔴 Poor (1)</span>
+      <span>Score</span>
+    </div>
+
+    <div id="oral-rows"></div>
+
+    <div class="comments-row">
+      <label>💬 Lecturer Comments – Oral Presentation</label>
+      <textarea id="oralComment" placeholder="Enter specific feedback on the oral delivery here..."></textarea>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ─── RUBRIC DATA (15 criteria, 150 pts, matches Teams) ────────
+const rubricData = {
+  slide: [
+    { name: "SLIDE — Slide Structure & Flow", weight: "6.7%  ·  10 pts", max: 10, levels: [
+        { score: 10, badge: "Outstanding", desc: "All slides present in perfect order with seamless flow. Title slide complete and professional. Each slide clearly connects to the next." },
+        { score: 8,  badge: "Excellent",   desc: "All slides present. Logical flow throughout. Title slide complete with all member names." },
+        { score: 6,  badge: "Good",        desc: "Most slides present. Minor flow gaps. Title slide mostly complete." },
+        { score: 3,  badge: "Fair",        desc: "Some slides missing or out of order. Title slide incomplete." },
+        { score: 1,  badge: "Poor",        desc: "Fewer than half of slides present. No clear structure. Missing title information." }
+    ]},
+    { name: "SLIDE — Physics Accuracy on Slides", weight: "10%  ·  15 pts", max: 15, levels: [
+        { score: 15, badge: "Outstanding", desc: "All physics concepts, formulas, and values completely correct. Explanations go beyond course content with insightful connections." },
+        { score: 12, badge: "Excellent",   desc: "All physics concepts and formulas correct. No errors in principles or values." },
+        { score: 9,  badge: "Good",        desc: "Mostly correct with 1-2 minor errors. Core concepts accurate." },
+        { score: 5,  badge: "Fair",        desc: "Some errors in formulas or concepts. 2-3 inaccuracies affect understanding." },
+        { score: 2,  badge: "Poor",        desc: "Significant errors. Formulas wrong or missing. Concepts misrepresented." }
+    ]},
+    { name: "SLIDE — Formula Presentation", weight: "6.7%  ·  10 pts", max: 10, levels: [
+        { score: 10, badge: "Outstanding", desc: "All required formulas shown with all variables defined and units given. Two or more full numerical worked examples. Physical meaning explained for each formula." },
+        { score: 8,  badge: "Excellent",   desc: "All required formulas shown. Every variable defined with correct units. At least one full numerical worked example on slide." },
+        { score: 6,  badge: "Good",        desc: "Most formulas shown. Most variables defined. Worked example attempted but incomplete." },
+        { score: 3,  badge: "Fair",        desc: "Some formulas shown without variable definitions. No worked example." },
+        { score: 1,  badge: "Poor",        desc: "Formulas absent or incorrect. No variable definitions. No worked example." }
+    ]},
+    { name: "SLIDE — Visuals & Diagrams", weight: "5.3%  ·  8 pts", max: 8, levels: [
+        { score: 8, badge: "Outstanding", desc: "Three or more original, clearly labeled, high-quality diagrams directly supporting the content. All figures properly cited." },
+        { score: 6, badge: "Excellent",   desc: "At least 2 clear, labeled diagrams or figures. Images relevant and high quality. Figures cited." },
+        { score: 5, badge: "Good",        desc: "1-2 diagrams present. Mostly clear but labels may be missing." },
+        { score: 3, badge: "Fair",        desc: "Only 1 unclear or irrelevant image. No labels or citation." },
+        { score: 1, badge: "Poor",        desc: "No diagrams or only decorative images unrelated to the topic." }
+    ]},
+    { name: "SLIDE — Design & Readability", weight: "4.7%  ·  7 pts", max: 7, levels: [
+        { score: 7, badge: "Outstanding", desc: "Exceptionally polished, professional design. Consistent theme, perfect font sizing, ideal use of white space. A model of clarity." },
+        { score: 6, badge: "Excellent",   desc: "Slides are clean, consistent, and professional. Font sizes readable. Not overcrowded with text." },
+        { score: 4, badge: "Good",        desc: "Generally readable. Some slides slightly crowded or inconsistent fonts." },
+        { score: 2, badge: "Fair",        desc: "Hard to read. Inconsistent design. Text too small or too crowded." },
+        { score: 1, badge: "Poor",        desc: "Very difficult to read. No design consideration. Distracting or unprofessional layout." }
+    ]}
+  ],
+
+  report: [
+    { name: "REPORT — Introduction & Structure", weight: "5.3%  ·  8 pts", max: 8, levels: [
+        { score: 8, badge: "Outstanding", desc: "All 5 sections complete and compelling. Introduction engaging, clearly states the connection to the subject. Exceeds 1,800 words." },
+        { score: 7, badge: "Excellent",   desc: "All 5 sections present and complete. Introduction clearly states topic, subject connection, and aim. Minimum 1,500 words met." },
+        { score: 5, badge: "Good",        desc: "4-5 sections present. Introduction adequate. Near word count (1,200-1,500 words)." },
+        { score: 3, badge: "Fair",        desc: "3-4 sections present. Introduction vague. Below 1,200 words." },
+        { score: 1, badge: "Poor",        desc: "Fewer than 3 sections. No clear structure. Very short (under 800 words)." }
+    ]},
+    { name: "REPORT — Physics Theory & Formulas", weight: "10%  ·  15 pts", max: 15, levels: [
+        { score: 15, badge: "Outstanding", desc: "All formulas explained with exceptional clarity, full numerical examples, and insightful interpretation that goes beyond the textbook." },
+        { score: 12, badge: "Excellent",   desc: "All required formulas explained clearly in own words. Full numerical example with step-by-step working shown. Variables defined correctly with units." },
+        { score: 9,  badge: "Good",        desc: "Most formulas explained. At least one numerical example shown. Minor errors in variables or units." },
+        { score: 5,  badge: "Fair",        desc: "Formulas stated but not explained. Numerical example missing or incorrect." },
+        { score: 2,  badge: "Poor",        desc: "Formulas missing or copied without understanding. No numerical application shown." }
+    ]},
+    { name: "REPORT — Real-World Application", weight: "6.7%  ·  10 pts", max: 10, levels: [
+        { score: 10, badge: "Outstanding", desc: "Exceptional real-world connection with specific data, statistics, and local context. Discusses limitations and future directions with original insight." },
+        { score: 8,  badge: "Excellent",   desc: "Strong, specific real-world connection with data/statistics. Multiple applications described. Local context included." },
+        { score: 6,  badge: "Good",        desc: "Good connection. 2-3 applications mentioned. Some specific details." },
+        { score: 3,  badge: "Fair",        desc: "Weak connection. Only one general application mentioned." },
+        { score: 1,  badge: "Poor",        desc: "No real-world connection or connection stated without any explanation." }
+    ]},
+    { name: "REPORT — Writing Quality & Language", weight: "6.7%  ·  10 pts", max: 10, levels: [
+        { score: 10, badge: "Outstanding", desc: "Exceptionally clear, fluent academic writing. Ideas expressed with precision and originality. Zero plagiarism. A pleasure to read." },
+        { score: 8,  badge: "Excellent",   desc: "Clear academic writing in own words. No plagiarism detected. Proper paragraphing. Formal language throughout." },
+        { score: 6,  badge: "Good",        desc: "Mostly clear writing. Minor grammar issues. No evident plagiarism." },
+        { score: 3,  badge: "Fair",        desc: "Some paraphrasing issues. Informal language used. Some sentences unclear." },
+        { score: 1,  badge: "Poor",        desc: "Evident copy-paste from internet. Very poor grammar or informal language throughout." }
+    ]},
+    { name: "REPORT — References & Citations", weight: "4.7%  ·  7 pts", max: 7, levels: [
+        { score: 7, badge: "Outstanding", desc: "5+ high-quality academic references in perfect APA 7th format. In-text citations consistently and correctly used throughout." },
+        { score: 6, badge: "Excellent",   desc: "Minimum 3 academic references in correct APA 7th format. In-text citations used correctly. No Wikipedia as primary source." },
+        { score: 4, badge: "Good",        desc: "2-3 references in mostly correct APA. Minor formatting errors. In-text citations mostly present." },
+        { score: 2, badge: "Fair",        desc: "1-2 references. APA format incorrect. Wikipedia used as main source." },
+        { score: 1, badge: "Poor",        desc: "No references, or not in APA format, or no in-text citations at all." }
+    ]}
+  ],
+
+  oral: [
+    { name: "ORAL — Clarity & Delivery", weight: "6.7%  ·  10 pts", max: 10, levels: [
+        { score: 10, badge: "Outstanding", desc: "Exceptionally confident, engaging, and dynamic delivery. Speaks naturally without notes. Commands full audience attention throughout." },
+        { score: 8,  badge: "Excellent",   desc: "Speaks clearly and confidently throughout. Good volume and pace. Maintains eye contact. Minimal reading from slides." },
+        { score: 6,  badge: "Good",        desc: "Mostly clear delivery. Occasional reading from slides. Generally good pace." },
+        { score: 3,  badge: "Fair",        desc: "Reads mostly from slides. Unclear or too fast/slow. Audience engagement low." },
+        { score: 1,  badge: "Poor",        desc: "Inaudible or very unclear. Reads directly from slides throughout. No audience engagement." }
+    ]},
+    { name: "ORAL — Physics Explanation Quality", weight: "10%  ·  15 pts", max: 15, levels: [
+        { score: 15, badge: "Outstanding", desc: "Masterful verbal explanation of all formulas. Goes significantly beyond slide content. Can answer challenging questions by reasoning from first principles." },
+        { score: 12, badge: "Excellent",   desc: "Explains all formulas verbally with clear meaning. Can elaborate beyond slide text. Shows deep understanding of the content." },
+        { score: 9,  badge: "Good",        desc: "Explains most content correctly. Some elaboration. Minor gaps in verbal explanation." },
+        { score: 5,  badge: "Fair",        desc: "Reads formula text only. Cannot explain meaning or derivation. Limited understanding shown." },
+        { score: 2,  badge: "Poor",        desc: "Cannot explain the formulas. Unclear or incorrect verbal explanation." }
+    ]},
+    { name: "ORAL — Time Management", weight: "5.3%  ·  8 pts", max: 8, levels: [
+        { score: 8, badge: "Outstanding", desc: "Exactly within required time with perfect pacing. Every slide given appropriate time. Transitions smooth and professional." },
+        { score: 6, badge: "Excellent",   desc: "Presentation within required time. All slides covered appropriately. Conclusion not rushed." },
+        { score: 5, badge: "Good",        desc: "Slightly over or under time. All slides covered but some rushed or slow sections." },
+        { score: 3, badge: "Fair",        desc: "Noticeably over or under time. Some slides skipped or too much time on one slide." },
+        { score: 1, badge: "Poor",        desc: "Very over or under time. Significant content skipped. Clearly not rehearsed." }
+    ]},
+    { name: "ORAL — Q&A Response", weight: "6.7%  ·  10 pts", max: 10, levels: [
+        { score: 10, badge: "Outstanding", desc: "Handles all questions with exceptional depth and poise. Demonstrates mastery beyond the topic. Invites further discussion and enriches the class." },
+        { score: 8,  badge: "Excellent",   desc: "Answers questions confidently and accurately. Shows understanding beyond memorized content. Engages class discussion question well." },
+        { score: 6,  badge: "Good",        desc: "Answers basic questions correctly. Partially answers deeper questions." },
+        { score: 3,  badge: "Fair",        desc: "Answers only surface questions. Cannot engage with formula-based questions." },
+        { score: 1,  badge: "Poor",        desc: "Cannot answer Q&A. Repeats slide text only or says 'I don\'t know' to all questions." }
+    ]},
+    { name: "ORAL — Teamwork & Participation", weight: "4.7%  ·  7 pts", max: 7, levels: [
+        { score: 7, badge: "Outstanding", desc: "All members speak equally and confidently. Roles perfectly balanced. Handovers seamless and group clearly rehearsed together." },
+        { score: 6, badge: "Excellent",   desc: "All group members speak. Roles distributed evenly. Smooth handovers between speakers." },
+        { score: 4, badge: "Good",        desc: "Most members speak. Minor imbalance in contribution." },
+        { score: 2, badge: "Fair",        desc: "1-2 members dominate. Others speak very little or read only." },
+        { score: 1, badge: "Poor",        desc: "Only 1 person presents. Others do not participate at all." }
+    ]}
+  ]
+};
+
+// ─── STATE ─────────────────────────────────────────────────
+const scores = { slide: {}, report: {}, oral: {} };
+
+// ─── BUILD ROWS ────────────────────────────────────────────
+function buildSection(sectionKey, containerId) {
+  const container = document.getElementById(containerId);
+  const data = rubricData[sectionKey];
+  const badgeClasses = ["badge-5","badge-4","badge-3","badge-2","badge-1"];
+  const levelClasses = ["level-5","level-4","level-3","level-2","level-1"];
+
+  data.forEach((criteria, ci) => {
+    const row = document.createElement('div');
+    row.className = 'criteria-row';
+
+    // Name cell
+    const nameCell = document.createElement('div');
+    nameCell.className = 'criteria-name';
+    nameCell.innerHTML = `${criteria.name}<span class="criteria-weight">${criteria.weight}</span>`;
+    row.appendChild(nameCell);
+
+    // Level cells
+    criteria.levels.forEach((level, li) => {
+      const cell = document.createElement('div');
+      cell.className = `level-cell ${levelClasses[li]}`;
+      cell.dataset.section = sectionKey;
+      cell.dataset.criteria = ci;
+      cell.dataset.score = level.score;
+      cell.dataset.level = li;
+      cell.innerHTML = `<span class="level-badge ${badgeClasses[li]}">${level.badge} · ${level.score}pts</span><br>${level.desc}`;
+      cell.onclick = () => selectScore(sectionKey, ci, level.score, li, criteria.max);
+      row.appendChild(cell);
+    });
+
+    // Points cell
+    const pts = document.createElement('div');
+    pts.className = 'points-cell';
+    pts.id = `pts-${sectionKey}-${ci}`;
+    pts.innerHTML = `<div class="points-val">—</div><div class="points-label">pts</div>`;
+    row.appendChild(pts);
+
+    container.appendChild(row);
+  });
+}
+
+buildSection('slide', 'slide-rows');
+buildSection('report', 'report-rows');
+buildSection('oral', 'oral-rows');
+
+// ─── SELECT SCORE ──────────────────────────────────────────
+function selectScore(section, criteriaIdx, score, levelIdx, max) {
+  document.querySelectorAll(`[data-section="${section}"][data-criteria="${criteriaIdx}"]`).forEach(c => {
+    c.classList.remove('selected');
+  });
+  const clicked = document.querySelector(
+    `[data-section="${section}"][data-criteria="${criteriaIdx}"][data-level="${levelIdx}"]`
+  );
+  if (clicked) clicked.classList.add('selected');
+
+  scores[section][criteriaIdx] = score;
+
+  const ptsEl = document.getElementById(`pts-${section}-${criteriaIdx}`);
+  if (ptsEl) ptsEl.innerHTML = `<div class="points-val" style="color:#1F4E79">${score}</div><div class="points-label">pts</div>`;
+
+  updateTotals();
+}
+
+// ─── UPDATE TOTALS ─────────────────────────────────────────
+function updateTotals() {
+  const sections = ['slide', 'report', 'oral'];
+  const maxes = { slide: 50, report: 50, oral: 50 };
+  let grand = 0;
+
+  sections.forEach(s => {
+    const total = Object.values(scores[s]).reduce((a, b) => a + b, 0);
+    grand += total;
+    document.getElementById(`${s}Score`).textContent = total;
+    document.getElementById(`${s}ScoreBar`).textContent = total;
+    document.getElementById(`${s}Bar`).style.width = `${(total / maxes[s]) * 100}%`;
+  });
+
+  document.getElementById('totalScore').textContent = grand;
+
+  const pct = (grand / 150) * 100;
+  let grade = '—';
+  if (grand > 0) {
+    if (pct >= 90) grade = 'A  (Outstanding)';
+    else if (pct >= 80) grade = 'B  (Excellent)';
+    else if (pct >= 70) grade = 'C  (Good)';
+    else if (pct >= 60) grade = 'D  (Fair)';
+    else grade = 'F  (Poor)';
+  }
+  document.getElementById('gradeLabel').textContent = grade;
+}
+
+// ─── SHOW SECTION ──────────────────────────────────────────
+function showSection(which) {
+  ['slide','report','oral'].forEach(s => {
+    document.getElementById(`sec-${s}`).classList.toggle('visible', which === 'all' || which === s);
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+// ─── DOWNLOAD PDF ──────────────────────────────────────────
+function downloadPDF() {
+  // Collect filled-in values
+  const subject = document.getElementById('subjectField') ? document.getElementById('subjectField').value : '';
+  const cls     = document.getElementById('classSel') ? document.getElementById('classSel').value : '';
+  const group   = document.getElementById('groupNum') ? document.getElementById('groupNum').value : '';
+  const names   = document.getElementById('studentNames') ? document.getElementById('studentNames').value : '';
+  const topic   = document.getElementById('topicSel') ? document.getElementById('topicSel').value : '';
+  const date    = document.getElementById('presDate') ? document.getElementById('presDate').value : '';
+  const total   = document.getElementById('totalScore') ? document.getElementById('totalScore').textContent : '0';
+  const grade   = document.getElementById('gradeLabel') ? document.getElementById('gradeLabel').textContent : '—';
+  const slideS  = document.getElementById('slideScore') ? document.getElementById('slideScore').textContent : '0';
+  const reportS = document.getElementById('reportScore') ? document.getElementById('reportScore').textContent : '0';
+  const oralS   = document.getElementById('oralScore') ? document.getElementById('oralScore').textContent : '0';
+  const slideCmt  = document.getElementById('slideComment') ? document.getElementById('slideComment').value : '';
+  const reportCmt = document.getElementById('reportComment') ? document.getElementById('reportComment').value : '';
+  const oralCmt   = document.getElementById('oralComment') ? document.getElementById('oralComment').value : '';
+
+  // Collect all selected scores
+  const selected = {};
+  document.querySelectorAll('.level-cell.selected').forEach(el => {
+    const sec = el.dataset.section;
+    const ci  = el.dataset.criteria;
+    const sc  = el.dataset.score;
+    const badge = el.querySelector('.level-badge') ? el.querySelector('.level-badge').textContent : '';
+    const desc  = el.textContent.replace(badge, '').trim();
+    if (!selected[sec]) selected[sec] = {};
+    selected[sec][ci] = { badge, desc, score: sc };
+  });
+
+  // Build print HTML
+  const rubricData_keys = { slide: 'Slide Presentation', report: 'Written Report', oral: 'Oral Presentation' };
+  const sectionScores   = { slide: slideS, report: reportS, oral: oralS };
+  const sectionColors   = { slide: '#1F4E79', report: '#1E5631', oral: '#8B4000' };
+  const comments        = { slide: slideCmt, report: reportCmt, oral: oralCmt };
+
+  let criteriaHTML = '';
+  Object.keys(rubricData).forEach(sec => {
+    criteriaHTML += `<div style="margin-bottom:24px;">
+      <div style="background:${sectionColors[sec]};color:white;padding:10px 16px;border-radius:6px 6px 0 0;font-weight:800;font-size:14px;">
+        ${rubricData_keys[sec]} — ${sectionScores[sec]} / 50
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr style="background:#f0f4f8;">
+          <th style="padding:6px 8px;text-align:left;border:1px solid #ddd;width:160px;">Criteria</th>
+          <th style="padding:6px 8px;text-align:left;border:1px solid #ddd;">Selected Level & Description</th>
+          <th style="padding:6px 8px;text-align:center;border:1px solid #ddd;width:60px;">Score</th>
+        </tr>`;
+    rubricData[sec].forEach((c, ci) => {
+      const sel = (selected[sec] && selected[sec][ci]) ? selected[sec][ci] : null;
+      criteriaHTML += `<tr style="background:${ci%2===0?'#fafafa':'white'}">
+        <td style="padding:6px 8px;border:1px solid #ddd;font-weight:700;vertical-align:top;">${c.name}<br><span style="font-weight:400;color:#888;">${c.weight}</span></td>
+        <td style="padding:6px 8px;border:1px solid #ddd;vertical-align:top;">${sel ? `<strong>${sel.badge}</strong> — ${sel.desc.substring(0,200)}` : '<em style="color:#aaa;">Not selected</em>'}</td>
+        <td style="padding:6px 8px;border:1px solid #ddd;text-align:center;font-weight:800;font-size:14px;vertical-align:middle;">${sel ? sel.score : '—'}</td>
+      </tr>`;
+    });
+    if (comments[sec]) {
+      criteriaHTML += `<tr><td colspan="3" style="padding:6px 8px;border:1px solid #ddd;background:#fffde7;">
+        <strong>Comments:</strong> ${comments[sec]}</td></tr>`;
+    }
+    criteriaHTML += `</table></div>`;
+  });
+
+  const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>${[subject,cls,group].filter(Boolean).join(' – ') || 'Rubric'}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; color: #1a1a2e; }
+    @media print { @page { margin: 1cm; } }
+  </style>
+  </head><body>
+  <div style="background:linear-gradient(135deg,#1F4E79,#2E75B6);color:white;padding:20px 24px;border-radius:8px;margin-bottom:20px;">
+    <div style="font-size:11px;letter-spacing:2px;color:#AED6F1;margin-bottom:4px;">PRESENTATION ASSESSMENT</div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:8px;">Rubric</div>
+    <div style="font-size:12px;color:#BDD7EE;">Royal University of Phnom Penh &nbsp;·&nbsp; Ms. Loch Socheata</div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px;">
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;background:#f0f4f8;width:25%;"><strong>Subject</strong></td><td style="padding:8px;border:1px solid #ddd;">${subject || '—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;background:#f0f4f8;width:25%;"><strong>Class</strong></td><td style="padding:8px;border:1px solid #ddd;">${cls || '—'}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;background:#f0f4f8;"><strong>Group</strong></td><td style="padding:8px;border:1px solid #ddd;">${group || '—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;background:#f0f4f8;"><strong>Date</strong></td><td style="padding:8px;border:1px solid #ddd;">${date || '—'}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;background:#f0f4f8;"><strong>Student(s)</strong></td><td style="padding:8px;border:1px solid #ddd;" colspan="3">${names || '—'}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;background:#f0f4f8;"><strong>Topic</strong></td><td style="padding:8px;border:1px solid #ddd;" colspan="3">${topic || '—'}</td>
+    </tr>
+  </table>
+  <div style="background:linear-gradient(135deg,#1F4E79,#2E75B6);color:white;padding:16px 20px;border-radius:8px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <div style="font-size:12px;color:#BDD7EE;">Slide: ${slideS}/50 &nbsp;·&nbsp; Report: ${reportS}/50 &nbsp;·&nbsp; Oral: ${oralS}/50</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:42px;font-weight:900;line-height:1;">${total}</div>
+      <div style="font-size:14px;color:#BDD7EE;">/ 150 &nbsp; ${grade}</div>
+    </div>
+  </div>
+  ${criteriaHTML}
+  <div style="margin-top:20px;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#888;text-align:center;">
+    Generated by Presentation Rubric &nbsp;·&nbsp; Ms. Loch Socheata &nbsp;·&nbsp; Royal University of Phnom Penh
+  </div>
+  <script>window.onload = function() { window.print(); }<\/script>
+  </body></html>`;
+
+  const blob = new Blob([printHTML], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (!win) {
+    // Fallback: direct download as HTML if popup blocked
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = ([subject,cls,group].filter(Boolean).join('_') || 'Rubric') + '.html';
+    a.click();
+  }
+}
+
+function openInBrowser() {
+  alert('To print:\n1. Press Ctrl+P (Windows) or Cmd+P (Mac)\n2. Choose "Save as PDF"\n3. Click Save');
+}
+
+// ─── RESET ─────────────────────────────────────────────────
+function showResetConfirm() {
+  document.getElementById('resetNormal').style.display = 'none';
+  document.getElementById('resetConfirm').style.display = 'flex';
+}
+
+function cancelReset() {
+  document.getElementById('resetConfirm').style.display = 'none';
+  document.getElementById('resetNormal').style.display = 'block';
+}
+
+function resetAll() {
+  Object.keys(scores).forEach(s => scores[s] = {});
+  document.querySelectorAll('.level-cell').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('[id^="pts-"]').forEach(el =>
+    el.innerHTML = `<div class="points-val">—</div><div class="points-label">pts</div>`
+  );
+  ['slide','report','oral'].forEach(s => {
+    document.getElementById(`${s}Score`).textContent = '0';
+    document.getElementById(`${s}ScoreBar`).textContent = '0';
+    document.getElementById(`${s}Bar`).style.width = '0%';
+    document.getElementById(`${s}Comment`).value = '';
+  });
+  document.getElementById('totalScore').textContent = '0';
+  document.getElementById('gradeLabel').textContent = '—';
+  // Reset student info fields
+  ['classSel','subjectField','groupNum','studentNames','topicSel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const dateEl = document.getElementById('presDate');
+  if (dateEl) dateEl.value = '';
+  cancelReset();
+}
+</script>
+</body>
+</html>
